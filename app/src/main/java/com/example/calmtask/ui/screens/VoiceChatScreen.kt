@@ -53,8 +53,9 @@ fun VoiceChatScreen(
     LaunchedEffect(speechManager) {
         speechManager.results.collectLatest { result ->
             isListening = false
+            speechManager.stopListening()
             when {
-                result == "__error__" -> response = "I missed that — try again when you’re ready."
+                result == "__error__" -> response = "I missed that — try again when you're ready."
                 result.isBlank() -> response = "I missed that."
                 else -> {
                     transcript = result
