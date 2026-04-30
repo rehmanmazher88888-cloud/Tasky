@@ -34,11 +34,18 @@ fun VoiceChatScreen(
     val speechManager = remember { SpeechRecognizerManager(context) }
     var permissionGranted by remember { mutableStateOf(false) }
 
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
         permissionGranted = granted
     }
+
     LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         } else {
             permissionGranted = true
@@ -50,12 +57,14 @@ fun VoiceChatScreen(
             speechManager.startListening()
         }
     }
+
     LaunchedEffect(speechManager) {
         speechManager.results.collectLatest { result ->
             isListening = false
-            speechManager.stopListening()
+            speechManager.destroy()
             when {
-                result == "__error__" -> response = "I missed that — try again when you're ready."
+                result == "__error__" -> response =
+                    "I missed that — try again when you're ready."
                 result.isBlank() -> response = "I missed that."
                 else -> {
                     transcript = result
@@ -67,11 +76,18 @@ fun VoiceChatScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp).statusBarsPadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Voice Chat", style = MaterialTheme.typography.headlineMedium, color = Color.White)
+        Text(
+            "Voice Chat",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color.White
+        )
         Spacer(modifier = Modifier.height(32.dp))
         MicButton(
             isListening = isListening,
@@ -81,7 +97,7 @@ fun VoiceChatScreen(
                     return@MicButton
                 }
                 isListening = !isListening
-                if (!isListening) speechManager.stopListening()
+                if (!isListening) speechManager.destroy()
             }
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -91,7 +107,11 @@ fun VoiceChatScreen(
             textAlign = TextAlign.Center
         )
         if (transcript.isNotEmpty()) {
-            Text("You: $transcript", color = Color.White, modifier = Modifier.padding(top = 8.dp))
+            Text(
+                "You: $transcript",
+                color = Color.White,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
