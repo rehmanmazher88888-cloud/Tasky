@@ -14,6 +14,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.material3.Text
 
 @Composable
 fun MicButton(
@@ -39,10 +41,9 @@ fun MicButton(
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        // Simple mic icon text placeholder
-        androidx.compose.material3.Text(
+        Text(
             text = if (isListening) "🎤" else "🎤",
-            fontSize = androidx.compose.ui.unit.sp(28)
+            fontSize = 28.sp
         )
     }
 }
