@@ -1,4 +1,3 @@
-import com.example.calmtask.MorningGreetingActivity
 package com.example.calmtask.receiver
 
 import android.content.BroadcastReceiver
@@ -22,7 +21,6 @@ class UnlockReceiver : BroadcastReceiver() {
             val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
             val lastMorning = repo.getLastMorningDateSync()
             if (lastMorning == today) return
-            // Save last morning date
             kotlinx.coroutines.runBlocking { repo.saveLastMorningDate(today) }
             val morningIntent = Intent(context, MorningGreetingActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
