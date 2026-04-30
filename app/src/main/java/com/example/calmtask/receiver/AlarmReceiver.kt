@@ -12,6 +12,7 @@ import com.example.calmtask.MainActivity
 import com.example.calmtask.R
 import com.example.calmtask.data.repository.AppRepository
 import com.example.calmtask.util.SpeechEngine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
@@ -21,7 +22,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val type = intent.getStringExtra("type") ?: return
         val repo = AppRepository(context)
         val meetings = runBlocking { repo.meetingsFlow.first() }
-        val meeting = meetings.find { it.id == meetingId } ?: return
+        val meeting = meetings.firstOrNull { m -> m.id == meetingId } ?: return
 
         val title = meeting.title
         val location = meeting.location
@@ -31,23 +32,20 @@ class AlarmReceiver : BroadcastReceiver() {
             else -> "Meeting reminder: $title"
         }
 
-        // Try playing voice4.wav if exists
         val voice4File = File(context.filesDir, "voices/voice4.wav")
         if (voice4File.exists()) {
-            val player = MediaPlayer().apply {
+            MediaPlayer().apply {
                 setDataSource(voice4File.absolutePath)
                 prepare()
                 start()
             }
         } else {
-            // TTS fallback
             val tts = SpeechEngine(context)
             runBlocking {
                 tts.init("en", 1.0f, 1.0f)
                 tts.speak(message)
             }
         }
-
         showNotification(context, meetingId, type, message)
     }
 
@@ -63,7 +61,9 @@ class AlarmReceiver : BroadcastReceiver() {
         }
         val pendingIntent = PendingIntent.getActivity(
             context, meetingId.hashCode(),
-            Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP },
+            Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            },
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val notification = NotificationCompat.Builder(context, channelId)
