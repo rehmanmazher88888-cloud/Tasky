@@ -136,7 +136,7 @@ fun MainApp(viewModel: MainViewModel = viewModel()) {
                             cmd.contains("done") || cmd.contains("mark done") -> viewModel.markTaskDone(todayTasks.firstOrNull()?.id ?: "")
                             cmd.contains("skip") -> viewModel.skipTask(todayTasks.firstOrNull()?.id ?: "")
                             cmd.contains("later") -> viewModel.markTaskLater(todayTasks.firstOrNull()?.id ?: "")
-                            else -> Toast.makeText(this@MainActivity, "Command: $cmd", Toast.LENGTH_SHORT).show()
+                            else -> Toast.makeText(Toast.makeText(context, ...) "Command: $cmd", Toast.LENGTH_SHORT).show()
                         }
                     })
                 }
